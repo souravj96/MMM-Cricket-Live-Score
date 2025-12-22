@@ -1,14 +1,44 @@
 {
   "name": "mmm-cricket-live-score",
   "version": "1.0.0",
-  "description": "MagicMirror module for live cricket matches using Cricbuzz RapidAPI",
-  "main": "index.js",
+  "description": "A MagicMirror² module to display live cricket scores with team logos using Cricbuzz RapidAPI",
+  "main": "MMM-Cricket-Live-Score.js",
+  "keywords": [
+    "MagicMirror",
+    "MagicMirror2",
+    "MMM",
+    "module",
+    "cricket",
+    "live-score",
+    "sports",
+    "cricbuzz",
+    "scoreboard",
+    "rapidapi"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Sourav Jana (github/souravj96)",
-  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/souravj96/MMM-Cricket-Live-Score.git"
+  },
+  "bugs": {
+    "url": "https://github.com/souravj96/MMM-Cricket-Live-Score/issues"
+  },
+  "homepage": "https://github.com/souravj96/MMM-Cricket-Live-Score#readme",
+  "author": {
+    "name": "Sourav Jana",
+    "url": "https://github.com/souravj96"
+  },
+  "contributors": [],
+  "license": "MIT",
+  "engines": {
+    "node": ">=14.0.0"
+  },
   "dependencies": {
     "node-fetch": "^3.3.2"
+  },
+  "peerDependencies": {
+    "magicmirror": "^2.0.0"
   }
 }
