@@ -1,0 +1,14 @@
+{
+  "name": "mmm-cricket-live-score",
+  "version": "1.0.0",
+  "description": "MagicMirror module for live cricket matches using Cricbuzz RapidAPI",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Sourav Jana (github/souravj96)",
+  "license": "ISC",
+  "dependencies": {
+    "node-fetch": "^3.3.2"
+  }
+}

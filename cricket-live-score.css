@@ -1,0 +1,44 @@
+/* Cricket Live Score Module Styles */
+
+.MMM-Cricket-Live-Score {
+  width: 100%;
+  max-width: 500px;
+}
+
+/* Animation for score updates */
+@keyframes scoreUpdate {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+/* Pulse animation for live indicator */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Live match indicator dot */
+.live-indicator {
+  width: 8px;
+  height: 8px;
+  background-color: #ff4444;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 5px;
+  animation: pulse 2s infinite;
+}
+
+/* Hover effects for match cards */
+.match-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5) !important;
+  transition: all 0.3s ease;
+}
+
+/* Responsive text */
+@media (max-width: 768px) {
+  .MMM-Cricket-Live-Score {
+    font-size: 0.9em;
+  }
+}
