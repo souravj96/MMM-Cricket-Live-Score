@@ -155,6 +155,12 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Changelog
 
+### Version 1.0.1 (2025-12-23)
+- Updated UI to monochrome design (black, white, and gray tones)
+- Added grayscale filter to team logos
+- Improved spacing between team names and scores
+- Enhanced readability with better visual balance
+
 ### Version 1.0.0 (2025-12-23)
 - Initial release
 - Live cricket scores from Cricbuzz

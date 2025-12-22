@@ -85,20 +85,20 @@ Module.register("MMM-Cricket-Live-Score", {
         border-radius: 8px;
         padding: 10px;
         margin-bottom: 10px;
-        border-left: 3px solid #4CAF50;
+        border-left: 3px solid #fff;
         box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
       `;
 
       const team1Image = match.team1ImageId && this.teamImages[match.team1ImageId] 
-        ? `<img src="${this.teamImages[match.team1ImageId]}" style="width: 25px; height: 25px; border-radius: 50%; margin-right: 8px; vertical-align: middle; border: 1px solid #fff;" />`
+        ? `<img src="${this.teamImages[match.team1ImageId]}" style="width: 25px; height: 25px; border-radius: 50%; margin-right: 8px; vertical-align: middle; border: 1px solid #888; filter: grayscale(100%);" />`
         : "";
       const team2Image = match.team2ImageId && this.teamImages[match.team2ImageId]
-        ? `<img src="${this.teamImages[match.team2ImageId]}" style="width: 25px; height: 25px; border-radius: 50%; margin-right: 8px; vertical-align: middle; border: 1px solid #fff;" />`
+        ? `<img src="${this.teamImages[match.team2ImageId]}" style="width: 25px; height: 25px; border-radius: 50%; margin-right: 8px; vertical-align: middle; border: 1px solid #888; filter: grayscale(100%);" />`
         : "";
 
       // Series title
       const titleHtml = `
-        <div style="text-align: center; font-size: 11px; font-weight: bold; margin-bottom: 8px; color: #4CAF50; text-transform: uppercase; letter-spacing: 0.5px;">
+        <div style="text-align: center; font-size: 11px; font-weight: bold; margin-bottom: 8px; color: #fff; text-transform: uppercase; letter-spacing: 0.5px;">
           ${match.title}
         </div>
       `;
@@ -107,18 +107,18 @@ Module.register("MMM-Cricket-Live-Score", {
       const team1Html = match.score1 ? `
         <div style="display: flex; align-items: center; margin-bottom: 5px; padding: 5px; background: rgba(255, 255, 255, 0.05); border-radius: 4px;">
           ${team1Image}
-          <div style="flex: 1;">
+          <div style="flex: 1; padding-right: 15px;">
             <span style="font-weight: bold; font-size: 13px; color: #fff;">${match.team1.teamSName}</span>
           </div>
           <div style="text-align: right;">
-            <span style="font-size: 16px; font-weight: bold; color: #4CAF50;">${match.score1.runs}/${match.score1.wickets}</span>
+            <span style="font-size: 16px; font-weight: bold; color: #fff;">${match.score1.runs}/${match.score1.wickets}</span>
             <span style="font-size: 11px; color: #aaa; margin-left: 5px;">(${match.score1.overs})</span>
           </div>
         </div>
       ` : `
         <div style="display: flex; align-items: center; margin-bottom: 5px; padding: 5px; background: rgba(255, 255, 255, 0.05); border-radius: 4px;">
           ${team1Image}
-          <div style="flex: 1;">
+          <div style="flex: 1; padding-right: 15px;">
             <span style="font-weight: bold; font-size: 13px; color: #fff;">${match.team1.teamSName}</span>
           </div>
           <div style="text-align: right;">
@@ -131,18 +131,18 @@ Module.register("MMM-Cricket-Live-Score", {
       const team2Html = match.score2 ? `
         <div style="display: flex; align-items: center; margin-bottom: 6px; padding: 5px; background: rgba(255, 255, 255, 0.05); border-radius: 4px;">
           ${team2Image}
-          <div style="flex: 1;">
+          <div style="flex: 1; padding-right: 15px;">
             <span style="font-weight: bold; font-size: 13px; color: #fff;">${match.team2.teamSName}</span>
           </div>
           <div style="text-align: right;">
-            <span style="font-size: 16px; font-weight: bold; color: #4CAF50;">${match.score2.runs}/${match.score2.wickets}</span>
+            <span style="font-size: 16px; font-weight: bold; color: #fff;">${match.score2.runs}/${match.score2.wickets}</span>
             <span style="font-size: 11px; color: #aaa; margin-left: 5px;">(${match.score2.overs})</span>
           </div>
         </div>
       ` : `
         <div style="display: flex; align-items: center; margin-bottom: 6px; padding: 5px; background: rgba(255, 255, 255, 0.05); border-radius: 4px;">
           ${team2Image}
-          <div style="flex: 1;">
+          <div style="flex: 1; padding-right: 15px;">
             <span style="font-weight: bold; font-size: 13px; color: #fff;">${match.team2.teamSName}</span>
           </div>
           <div style="text-align: right;">
@@ -153,7 +153,7 @@ Module.register("MMM-Cricket-Live-Score", {
 
       // Match status
       const statusHtml = `
-        <div style="text-align: center; font-size: 10px; color: #FFD700; font-style: italic; margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+        <div style="text-align: center; font-size: 10px; color: #ccc; font-style: italic; margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
           ${match.status}
         </div>
       `;

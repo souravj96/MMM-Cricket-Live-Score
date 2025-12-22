@@ -1,6 +1,6 @@
 {
   "name": "mmm-cricket-live-score",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A MagicMirror² module to display live cricket scores with team logos using Cricbuzz RapidAPI",
   "main": "MMM-Cricket-Live-Score.js",
   "keywords": [
