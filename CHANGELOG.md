@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2025-12-23
+
+### Added
+- Automatic transition from upcoming to live matches based on scheduled start time
+- Scheduled API checks trigger automatically when upcoming matches reach start time
+- Enhanced live match detection using both `status` and `state` fields
+- Support for multiple match states: In Progress, Toss, Innings Break, Stumps, Lunch, Tea, Delay, Rain Delay
+- Toss state now treated as live event (shows green indicator, updates every minute)
+- Match start time tracking and automatic timer scheduling
+- Project documentation: LICENSE, CHANGELOG.md, CODE_OF_CONDUCT.md
+- Dependabot configuration for automated dependency updates
+- ESLint configuration for code quality with npm scripts (lint, lint:fix)
+
+### Changed
+- Live match detection now checks both status messages and match state
+- Improved API call efficiency with smart scheduling based on match start times
+- Updated README with file structure, linting instructions, and community guidelines
+
 ## [1.2.0] - 2025-12-23
 
 ### Added
@@ -58,6 +76,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Match status display (Live, Completed, etc.)
 - Error handling and loading states
 
+[1.3.0]: https://github.com/souravj96/MMM-Cricket-Live-Score/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/souravj96/MMM-Cricket-Live-Score/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/souravj96/MMM-Cricket-Live-Score/compare/v1.0.1...v1.1.0
 [1.0.1]: https://github.com/souravj96/MMM-Cricket-Live-Score/compare/v1.0.0...v1.0.1

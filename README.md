@@ -103,6 +103,14 @@ The module displays:
 - **Smart update frequency**:
   - **Live matches active**: Updates every minute (configurable)
   - **No live matches**: Checks once daily at midnight
+- **Automatic transition to live**: 
+  - Schedules API checks at upcoming match start times
+  - Automatically switches to live updates when match begins
+  - No manual intervention required
+- **Enhanced live detection**:
+  - Detects live state from both status and state fields
+  - Supports multiple states: In Progress, Toss, Innings Break, Stumps, Lunch, Tea, Delay
+  - Shows green pulsing indicator for active matches
 - Displays multiple matches in carousel mode
 - **Automatically hides when no matches are available**
 - **Automatically shows when matches become available**
@@ -204,12 +212,13 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 For a detailed list of changes and version history, see [CHANGELOG.md](CHANGELOG.md).
 
-### Latest Version: 1.2.0 (2025-12-23)
-- **Cascading API calls**: Checks live matches first, then upcoming matches as fallback
-- **Smart update frequency**: API calls every minute when matches are live, once daily otherwise
-- **Live match indicator**: Green pulsing dot for active matches
-- Automatic detection of live match status
-- Module hides only when both live and upcoming matches are unavailable
+### Latest Version: 1.3.0 (2025-12-23)
+- **Automatic transition to live**: Schedules checks at match start times, seamlessly switches to live updates
+- **Enhanced live detection**: Uses both status and state fields to detect live matches
+- **Multiple match states**: Supports Toss, In Progress, Innings Break, Stumps, Lunch, Tea, Delay states
+- **Project documentation**: Added LICENSE, CHANGELOG.md, CODE_OF_CONDUCT.md
+- **Development tools**: ESLint configuration, Dependabot for dependency updates
+- Smart scheduling with automatic timers for upcoming matches
 - Optimized API usage to save quota
 
 For complete version history, see [CHANGELOG.md](CHANGELOG.md).

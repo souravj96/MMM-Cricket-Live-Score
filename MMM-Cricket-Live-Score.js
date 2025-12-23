@@ -13,6 +13,7 @@ Module.register("MMM-Cricket-Live-Score", {
     this.carouselTimer = null;
     this.updateTimer = null;
     this.midnightTimer = null;
+    this.matchStartTimers = []; // Track timers for upcoming match start times
     this.noMatchesDate = null; // Track the date when no matches were found
     this.hasLiveMatches = false; // Track if there are currently live matches
     this.dailyCheckDone = false; // Track if daily check is done
@@ -50,6 +51,35 @@ Module.register("MMM-Cricket-Live-Score", {
       // Reschedule for next midnight
       this.scheduleMidnightCheck();
     }, msUntilMidnight);
+  },
+
+  scheduleMatchStartChecks(matches) {
+    // Clear existing match start timers
+    if (this.matchStartTimers && this.matchStartTimers.length > 0) {
+      this.matchStartTimers.forEach(timer => clearTimeout(timer));
+      this.matchStartTimers = [];
+    }
+
+    const now = Date.now();
+    
+    matches.forEach(match => {
+      if (match.startDate) {
+        const startTime = parseInt(match.startDate);
+        const timeUntilStart = startTime - now;
+        
+        // If match starts in the future (within next 24 hours), schedule a check
+        if (timeUntilStart > 0 && timeUntilStart < 24 * 60 * 60 * 1000) {
+          console.log(`Scheduling check for match "${match.title}" starting in ${Math.round(timeUntilStart / 1000 / 60)} minutes`);
+          
+          const timer = setTimeout(() => {
+            console.log(`Match start time reached for "${match.title}", checking for live matches`);
+            this.sendSocketNotification("GET_LIVE_MATCHES", this.config);
+          }, timeUntilStart);
+          
+          this.matchStartTimers.push(timer);
+        }
+      }
+    });
   },
 
   scheduleUpdate() {
@@ -104,13 +134,24 @@ Module.register("MMM-Cricket-Live-Score", {
       this.currentMatchIndex = 0; // Reset to first match
       
       // Check if any match is live
-      const hasLive = this.matches.some(match => 
-        match.status && (
-          match.status.toLowerCase().includes('live') ||
-          match.status.toLowerCase().includes('in progress') ||
-          match.status.toLowerCase().includes('innings break')
-        )
-      );
+      const hasLive = this.matches.some(match => {
+        const statusLower = match.status ? match.status.toLowerCase() : '';
+        const stateLower = match.state ? match.state.toLowerCase() : '';
+        
+        return (
+          statusLower.includes('live') ||
+          statusLower.includes('in progress') ||
+          statusLower.includes('innings break') ||
+          stateLower === 'in progress' ||
+          stateLower === 'innings break' ||
+          stateLower === 'stumps' ||
+          stateLower === 'lunch' ||
+          stateLower === 'tea' ||
+          stateLower === 'delay' ||
+          stateLower === 'rain delay' ||
+          stateLower === 'toss'
+        );
+      });
       
       // If live status changed, reschedule updates
       if (hasLive !== this.hasLiveMatches) {
@@ -123,6 +164,9 @@ Module.register("MMM-Cricket-Live-Score", {
       if (!hasLive) {
         this.dailyCheckDone = true;
       }
+      
+      // Schedule checks for upcoming match start times
+      this.scheduleMatchStartChecks(this.matches);
       
       // Show module if it was hidden and reset noMatchesDate
       if (this.matches.length > 0) {
@@ -175,12 +219,14 @@ Module.register("MMM-Cricket-Live-Score", {
           matches.push({
             title: info.seriesName,
             status: info.status,
+            state: info.state, // Include match state
             score1: score?.team1Score?.inngs1,
             score2: score?.team2Score?.inngs1,
             team1: info.team1,
             team2: info.team2,
             team1ImageId: info.team1?.imageId,
-            team2ImageId: info.team2?.imageId
+            team2ImageId: info.team2?.imageId,
+            startDate: info.startDate // Include match start time
           });
         });
       });
@@ -227,10 +273,21 @@ Module.register("MMM-Cricket-Live-Score", {
         : "";
 
       // Check if match is live
-      const isLive = match.status && (
-        match.status.toLowerCase().includes('live') ||
-        match.status.toLowerCase().includes('in progress') ||
-        match.status.toLowerCase().includes('innings break')
+      const statusLower = match.status ? match.status.toLowerCase() : '';
+      const stateLower = match.state ? match.state.toLowerCase() : '';
+      
+      const isLive = (
+        statusLower.includes('live') ||
+        statusLower.includes('in progress') ||
+        statusLower.includes('innings break') ||
+        stateLower === 'in progress' ||
+        stateLower === 'innings break' ||
+        stateLower === 'stumps' ||
+        stateLower === 'lunch' ||
+        stateLower === 'tea' ||
+        stateLower === 'delay' ||
+        stateLower === 'rain delay' ||
+        stateLower === 'toss'
       );
 
       // Live indicator dot
@@ -322,10 +379,21 @@ Module.register("MMM-Cricket-Live-Score", {
       clearInterval(this.carouselTimer);
       this.carouselTimer = null;
     }
+    
+    // Clear match start timers
+    if (this.matchStartTimers && this.matchStartTimers.length > 0) {
+      this.matchStartTimers.forEach(timer => clearTimeout(timer));
+      this.matchStartTimers = [];
+    }
   },
 
   resume() {
     // Restart carousel when module is shown
     this.startCarousel();
+    
+    // Reschedule match start checks
+    if (this.matches && this.matches.length > 0) {
+      this.scheduleMatchStartChecks(this.matches);
+    }
   }
 });
