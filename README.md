@@ -10,8 +10,9 @@ A [MagicMirror²](https://github.com/MagicMirrorOrg/MagicMirror) module to displ
 - 🏏 **Live Cricket Scores** - Real-time updates from Cricbuzz via RapidAPI
 - 🖼️ **Team Logos** - Displays team logos fetched from Cricbuzz
 - 📊 **Professional Scoreboard** - Clean, compact design with match status
+- 🎠 **Carousel Mode** - Automatically rotates between multiple live matches
 - ⚡ **Auto-refresh** - Configurable update intervals
-- 🎨 **Modern UI** - Beautiful card-based layout with smooth animations
+- 🎨 **Modern UI** - Beautiful monochrome card-based layout with smooth animations
 
 ## Screenshots
 
@@ -19,28 +20,31 @@ A [MagicMirror²](https://github.com/MagicMirrorOrg/MagicMirror) module to displ
 
 ## Installation
 
-### Step 1: Clone the Repository
-
-Navigate to your MagicMirror's `modules` folder and clone this repository:
+Navigate to your MagicMirror's `modules` folder and run the following commands:
 
 ```bash
 cd ~/MagicMirror/modules
 git clone https://github.com/souravj96/MMM-Cricket-Live-Score.git
-```
-
-### Step 2: Install Dependencies
-
-```bash
 cd MMM-Cricket-Live-Score
 npm install
 ```
 
-### Step 3: Get RapidAPI Key
+### Get RapidAPI Key
 
 1. Go to [RapidAPI Cricbuzz Cricket API](https://rapidapi.com/cricketapilive/api/cricbuzz-cricket/)
 2. Sign up or log in to RapidAPI
 3. Subscribe to the Cricbuzz Cricket API (free tier available)
 4. Copy your API key from the API dashboard
+
+## Updating
+
+To update the module to the latest version, run the following commands:
+
+```bash
+cd ~/MagicMirror/modules/MMM-Cricket-Live-Score
+git pull
+npm install
+```
 
 ## Configuration
 
@@ -54,7 +58,7 @@ Add the module to your `config/config.js` file:
     apiKey: "YOUR_RAPIDAPI_KEY_HERE", // Required: Your RapidAPI key
     updateInterval: 60000 // Optional: Update interval in milliseconds (default: 60000 = 1 minute)
   }
-}
+},
 ```
 
 ## Configuration Options
@@ -63,6 +67,7 @@ Add the module to your `config/config.js` file:
 |--------|------|---------|-------------|
 | `apiKey` | `string` | **Required** | Your RapidAPI key for Cricbuzz Cricket API |
 | `updateInterval` | `number` | `60000` | How often to fetch new data (in milliseconds). Default is 1 minute. |
+| `carouselInterval` | `number` | `10000` | Time to show each match in carousel (in milliseconds). Default is 10 seconds. Only applies when multiple matches are available. |
 
 ## Usage Example
 
@@ -72,9 +77,10 @@ Add the module to your `config/config.js` file:
   position: "top_right",
   config: {
     apiKey: "5139c4b304msh75e2d838fbdc51ep13e78bjsn9b34e36fc005",
-    updateInterval: 30000 // Update every 30 seconds
+    updateInterval: 30000, // Update every 30 seconds
+    carouselInterval: 15000 // Show each match for 15 seconds
   }
-}
+},
 ```
 
 ## Display Information
@@ -90,8 +96,17 @@ The module displays:
 
 ### Live Score Updates
 - Automatically fetches live cricket matches from Cricbuzz
-- Updates at configurable intervals
-- Displays multiple matches if available
+- **Cascading API calls**:
+  1. First checks for **live matches**
+  2. If no live matches, checks for **upcoming matches**
+  3. If neither available, **hides the module**
+- **Smart update frequency**:
+  - **Live matches active**: Updates every minute (configurable)
+  - **No live matches**: Checks once daily at midnight
+- Displays multiple matches in carousel mode
+- **Automatically hides when no matches are available**
+- **Automatically shows when matches become available**
+- **Intelligent API management**: Minimizes API calls to save quota
 
 ### Team Logos
 - Fetches team logos dynamically from Cricbuzz API
@@ -108,8 +123,14 @@ The module displays:
 This module uses the [Cricbuzz Cricket API](https://rapidapi.com/cricketapilive/api/cricbuzz-cricket/) via RapidAPI.
 
 **Endpoints Used:**
-- `/matches/v1/live` - Fetches live match data
+- `/matches/v1/live` - Fetches live match data (checked first)
+- `/matches/v1/upcoming` - Fetches upcoming match data (fallback)
 - `/img/v1/i1/c{imageId}/i.jpg` - Fetches team logos
+
+**API Call Logic:**
+1. Attempts to fetch live matches
+2. If no live matches found, fetches upcoming matches
+3. If neither available, hides module until next check
 
 ## Troubleshooting
 
@@ -133,15 +154,41 @@ This module uses the [Cricbuzz Cricket API](https://rapidapi.com/cricketapilive/
 ### File Structure
 ```
 MMM-Cricket-Live-Score/
+├── .github/
+│   └── dependabot.yml           # Dependabot configuration
 ├── MMM-Cricket-Live-Score.js    # Main module file
 ├── node_helper.js               # Backend helper for API calls
 ├── cricket-live-score.css       # Styling
 ├── package.json                 # Dependencies
+├── .eslintrc.json               # ESLint configuration
+├── .eslintignore                # ESLint ignore rules
+├── CHANGELOG.md                 # Version history
+├── CODE_OF_CONDUCT.md           # Community guidelines
+├── LICENSE                      # MIT License
 └── README.md                    # Documentation
 ```
 
+### Linting
+
+This project uses ESLint to maintain code quality. To run linting:
+
+```bash
+# Check for linting errors
+npm run lint
+
+# Automatically fix fixable issues
+npm run lint:fix
+```
+
 ### Contributing
+
 Contributions are welcome! Please feel free to submit a Pull Request.
+
+Before contributing, please:
+1. Read our [Code of Conduct](CODE_OF_CONDUCT.md)
+2. Check the [open issues](https://github.com/souravj96/MMM-Cricket-Live-Score/issues)
+3. Run `npm run lint` to ensure code quality
+4. Test your changes thoroughly
 
 ## Credits
 
@@ -155,19 +202,17 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Changelog
 
-### Version 1.0.1 (2025-12-23)
-- Updated UI to monochrome design (black, white, and gray tones)
-- Added grayscale filter to team logos
-- Improved spacing between team names and scores
-- Enhanced readability with better visual balance
+For a detailed list of changes and version history, see [CHANGELOG.md](CHANGELOG.md).
 
-### Version 1.0.0 (2025-12-23)
-- Initial release
-- Live cricket scores from Cricbuzz
-- Team logo display
-- Professional scoreboard UI
-- Auto-refresh functionality
-- Configurable update intervals
+### Latest Version: 1.2.0 (2025-12-23)
+- **Cascading API calls**: Checks live matches first, then upcoming matches as fallback
+- **Smart update frequency**: API calls every minute when matches are live, once daily otherwise
+- **Live match indicator**: Green pulsing dot for active matches
+- Automatic detection of live match status
+- Module hides only when both live and upcoming matches are unavailable
+- Optimized API usage to save quota
+
+For complete version history, see [CHANGELOG.md](CHANGELOG.md).
 
 ## Support
 
@@ -180,6 +225,12 @@ If you encounter any issues or have questions:
 - Thanks to the MagicMirror² community
 - Cricbuzz for providing cricket data
 - RapidAPI for API infrastructure
+
+## Community
+
+- **Code of Conduct**: Please read our [Code of Conduct](CODE_OF_CONDUCT.md) before participating
+- **Security**: Dependabot is enabled to keep dependencies up to date
+- **Quality**: ESLint is configured for consistent code style
 
 ---
 

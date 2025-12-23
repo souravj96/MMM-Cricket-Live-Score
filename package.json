@@ -1,11 +1,11 @@
 {
   "name": "mmm-cricket-live-score",
-  "version": "1.0.1",
+  "version": "1.2.0",
   "description": "A MagicMirror² module to display live cricket scores with team logos using Cricbuzz RapidAPI",
   "main": "MMM-Cricket-Live-Score.js",
   "keywords": [
     "MagicMirror",
-    "MagicMirror2",
+    "MagicMirror²",
     "MMM",
     "module",
     "cricket",
@@ -16,7 +16,9 @@
     "rapidapi"
   ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "repository": {
     "type": "git",
@@ -33,12 +35,12 @@
   "contributors": [],
   "license": "MIT",
   "engines": {
-    "node": ">=14.0.0"
-  },
-  "dependencies": {
-    "node-fetch": "^3.3.2"
+    "node": ">=18.0.0"
   },
   "peerDependencies": {
     "magicmirror": "^2.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^9.39.2"
   }
 }

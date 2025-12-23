@@ -1,24 +1,137 @@
 Module.register("MMM-Cricket-Live-Score", {
   defaults: {
     apiKey: "",          // RapidAPI key
-    updateInterval: 60 * 1000 // 1 minute
+    updateInterval: 60 * 1000, // 1 minute
+    carouselInterval: 10 * 1000 // 10 seconds - time to show each match
   },
 
   start() {
     console.log("MMM-Cricket-Live-Score module started");
     this.matches = [];
     this.teamImages = {};
+    this.currentMatchIndex = 0;
+    this.carouselTimer = null;
+    this.updateTimer = null;
+    this.midnightTimer = null;
+    this.noMatchesDate = null; // Track the date when no matches were found
+    this.hasLiveMatches = false; // Track if there are currently live matches
+    this.dailyCheckDone = false; // Track if daily check is done
+    
     this.sendSocketNotification("GET_LIVE_MATCHES", this.config);
+    this.scheduleUpdate();
+    this.scheduleMidnightCheck();
+  },
 
-    setInterval(() => {
+  scheduleMidnightCheck() {
+    // Check at midnight to reset noMatchesDate
+    const now = new Date();
+    const tomorrow = new Date(now);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+    
+    const msUntilMidnight = tomorrow - now;
+    
+    // Clear existing timer
+    if (this.midnightTimer) {
+      clearTimeout(this.midnightTimer);
+    }
+    
+    // Set timer for midnight
+    this.midnightTimer = setTimeout(() => {
+      console.log("Midnight reached, resetting daily check flag");
+      this.dailyCheckDone = false;
+      this.noMatchesDate = null;
+      
+      // If no live matches, do a daily check
+      if (!this.hasLiveMatches) {
+        this.sendSocketNotification("GET_LIVE_MATCHES", this.config);
+      }
+      
+      // Reschedule for next midnight
+      this.scheduleMidnightCheck();
+    }, msUntilMidnight);
+  },
+
+  scheduleUpdate() {
+    // Clear existing timer
+    if (this.updateTimer) {
+      clearInterval(this.updateTimer);
+    }
+
+    // Determine interval based on whether there are live matches
+    const interval = this.hasLiveMatches ? this.config.updateInterval : 24 * 60 * 60 * 1000; // 1 minute vs 24 hours
+    
+    console.log(`Scheduling updates every ${interval / 1000 / 60} minutes`);
+
+    this.updateTimer = setInterval(() => {
+      // If there are live matches, always call API
+      if (this.hasLiveMatches) {
+        console.log("Live matches active, calling API");
+        this.sendSocketNotification("GET_LIVE_MATCHES", this.config);
+        return;
+      }
+
+      // If no live matches and daily check already done, skip
+      if (this.dailyCheckDone) {
+        console.log("Daily check already done, skipping API call");
+        return;
+      }
+
+      // Otherwise, do the daily check
+      console.log("Performing daily check for matches");
       this.sendSocketNotification("GET_LIVE_MATCHES", this.config);
-    }, this.config.updateInterval);
+    }, interval);
+  },
+
+  startCarousel() {
+    // Clear existing timer
+    if (this.carouselTimer) {
+      clearInterval(this.carouselTimer);
+    }
+    
+    // Only start carousel if there are multiple matches
+    if (this.matches && this.matches.length > 1) {
+      this.carouselTimer = setInterval(() => {
+        this.currentMatchIndex = (this.currentMatchIndex + 1) % this.matches.length;
+        this.updateDom(300); // 300ms animation
+      }, this.config.carouselInterval);
+    }
   },
 
   socketNotificationReceived(notification, payload) {
     if (notification === "LIVE_MATCHES") {
       this.matches = this.parseMatches(payload);
+      this.currentMatchIndex = 0; // Reset to first match
+      
+      // Check if any match is live
+      const hasLive = this.matches.some(match => 
+        match.status && (
+          match.status.toLowerCase().includes('live') ||
+          match.status.toLowerCase().includes('in progress') ||
+          match.status.toLowerCase().includes('innings break')
+        )
+      );
+      
+      // If live status changed, reschedule updates
+      if (hasLive !== this.hasLiveMatches) {
+        console.log(`Live match status changed: ${hasLive ? 'Live matches found' : 'No live matches'}`);
+        this.hasLiveMatches = hasLive;
+        this.scheduleUpdate(); // Reschedule with appropriate interval
+      }
+      
+      // Mark daily check as done if no live matches
+      if (!hasLive) {
+        this.dailyCheckDone = true;
+      }
+      
+      // Show module if it was hidden and reset noMatchesDate
+      if (this.matches.length > 0) {
+        this.noMatchesDate = null; // Reset since we have matches
+        this.show(1000); // Show module with 1 second transition
+      }
+      
       this.updateDom();
+      this.startCarousel(); // Start carousel for multiple matches
       
       // Request images for teams
       this.matches.forEach(match => {
@@ -35,6 +148,13 @@ Module.register("MMM-Cricket-Live-Score", {
           });
         }
       });
+    } else if (notification === "NO_MATCHES") {
+      this.matches = [];
+      this.noMatchesDate = new Date();
+      this.hasLiveMatches = false;
+      this.dailyCheckDone = true; // Mark daily check as done
+      console.log("No matches found, will check again tomorrow");
+      this.hide(1000); // Hide module with 1 second transition
     } else if (notification === "TEAM_IMAGE") {
       this.teamImages[payload.imageId] = payload.image;
       this.updateDom();
@@ -71,35 +191,63 @@ Module.register("MMM-Cricket-Live-Score", {
 
   getDom() {
     const wrapper = document.createElement("div");
-    wrapper.style.cssText = "font-family: 'Roboto', sans-serif;";
+    wrapper.style.cssText = "font-family: 'Roboto', sans-serif; position: relative;";
 
-    if (!this.matches.length) {
-      wrapper.innerHTML = "<div style='text-align: center; padding: 10px; opacity: 0.7; font-size: 12px;'>Loading live matches...</div>";
+    // Return empty div if no matches (module will be hidden anyway)
+    if (!this.matches || this.matches.length === 0) {
       return wrapper;
     }
 
-    this.matches.forEach(match => {
-      const matchDiv = document.createElement("div");
-      matchDiv.style.cssText = `
-        background: rgba(0, 0, 0, 0.4);
-        border-radius: 8px;
-        padding: 10px;
-        margin-bottom: 10px;
-        border-left: 3px solid #fff;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-      `;
+    // Get current match to display (carousel)
+    const match = this.matches[this.currentMatchIndex];
+    
+    // Show match indicator if multiple matches
+    if (this.matches.length > 1) {
+      const indicator = document.createElement("div");
+      indicator.style.cssText = "text-align: center; font-size: 10px; color: #888; margin-bottom: 5px;";
+      indicator.innerHTML = `Match ${this.currentMatchIndex + 1} of ${this.matches.length}`;
+      wrapper.appendChild(indicator);
+    }
 
-      const team1Image = match.team1ImageId && this.teamImages[match.team1ImageId] 
-        ? `<img src="${this.teamImages[match.team1ImageId]}" style="width: 25px; height: 25px; border-radius: 50%; margin-right: 8px; vertical-align: middle; border: 1px solid #888; filter: grayscale(100%);" />`
-        : "";
-      const team2Image = match.team2ImageId && this.teamImages[match.team2ImageId]
+    // Display current match only
+    const matchDiv = document.createElement("div");
+    matchDiv.style.cssText = `
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 8px;
+      padding: 10px;
+      border-left: 3px solid #fff;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    `;
+
+    const team1Image = match.team1ImageId && this.teamImages[match.team1ImageId] 
+      ? `<img src="${this.teamImages[match.team1ImageId]}" style="width: 25px; height: 25px; border-radius: 50%; margin-right: 8px; vertical-align: middle; border: 1px solid #888; filter: grayscale(100%);" />`
+      : "";
+    const team2Image = match.team2ImageId && this.teamImages[match.team2ImageId]
         ? `<img src="${this.teamImages[match.team2ImageId]}" style="width: 25px; height: 25px; border-radius: 50%; margin-right: 8px; vertical-align: middle; border: 1px solid #888; filter: grayscale(100%);" />`
         : "";
+
+      // Check if match is live
+      const isLive = match.status && (
+        match.status.toLowerCase().includes('live') ||
+        match.status.toLowerCase().includes('in progress') ||
+        match.status.toLowerCase().includes('innings break')
+      );
+
+      // Live indicator dot
+      const liveIndicator = isLive ? `
+        <span style="display: inline-block; width: 8px; height: 8px; background-color: #00ff00; border-radius: 50%; margin-right: 5px; animation: pulse 2s infinite;"></span>
+        <style>
+          @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+          }
+        </style>
+      ` : "";
 
       // Series title
       const titleHtml = `
         <div style="text-align: center; font-size: 11px; font-weight: bold; margin-bottom: 8px; color: #fff; text-transform: uppercase; letter-spacing: 0.5px;">
-          ${match.title}
+          ${liveIndicator}${match.title}
         </div>
       `;
 
@@ -160,12 +308,24 @@ Module.register("MMM-Cricket-Live-Score", {
 
       matchDiv.innerHTML = titleHtml + team1Html + team2Html + statusHtml;
       wrapper.appendChild(matchDiv);
-    });
 
     return wrapper;
   },
 
   getStyles() {
     return ["cricket-live-score.css"];
+  },
+
+  suspend() {
+    // Stop carousel when module is hidden
+    if (this.carouselTimer) {
+      clearInterval(this.carouselTimer);
+      this.carouselTimer = null;
+    }
+  },
+
+  resume() {
+    // Restart carousel when module is shown
+    this.startCarousel();
   }
 });
