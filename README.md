@@ -168,8 +168,7 @@ MMM-Cricket-Live-Score/
 ├── node_helper.js               # Backend helper for API calls
 ├── cricket-live-score.css       # Styling
 ├── package.json                 # Dependencies
-├── .eslintrc.json               # ESLint configuration
-├── .eslintignore                # ESLint ignore rules
+├── eslint.config.js             # ESLint flat config
 ├── CHANGELOG.md                 # Version history
 ├── CODE_OF_CONDUCT.md           # Community guidelines
 ├── LICENSE                      # MIT License
@@ -182,10 +181,10 @@ This project uses ESLint to maintain code quality. To run linting:
 
 ```bash
 # Check for linting errors
-npm run lint
+node --run lint
 
 # Automatically fix fixable issues
-npm run lint:fix
+node --run lint:fix
 ```
 
 ### Contributing
@@ -195,7 +194,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 Before contributing, please:
 1. Read our [Code of Conduct](CODE_OF_CONDUCT.md)
 2. Check the [open issues](https://github.com/souravj96/MMM-Cricket-Live-Score/issues)
-3. Run `npm run lint` to ensure code quality
+3. Run `node --run lint` to ensure code quality
 4. Test your changes thoroughly
 
 ## Credits
@@ -212,12 +211,14 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 For a detailed list of changes and version history, see [CHANGELOG.md](CHANGELOG.md).
 
-### Latest Version: 1.3.0 (2025-12-23)
+### Latest Version: 1.3.0 (2025-12-24)
 - **Automatic transition to live**: Schedules checks at match start times, seamlessly switches to live updates
 - **Enhanced live detection**: Uses both status and state fields to detect live matches
 - **Multiple match states**: Supports Toss, In Progress, Innings Break, Stumps, Lunch, Tea, Delay states
+- **Smart filtering**: Automatically removes completed matches when live matches are active
+- **Modern ESLint**: Migrated to ESLint v9 flat config format with proper Node.js globals
 - **Project documentation**: Added LICENSE, CHANGELOG.md, CODE_OF_CONDUCT.md
-- **Development tools**: ESLint configuration, Dependabot for dependency updates
+- **Development tools**: ESLint flat config, Dependabot for dependency updates
 - Smart scheduling with automatic timers for upcoming matches
 - Optimized API usage to save quota
 

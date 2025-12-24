@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.3.0] - 2025-12-23
+## [1.3.0] - 2025-12-24
 
 ### Added
 - Automatic transition from upcoming to live matches based on scheduled start time
@@ -14,14 +14,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support for multiple match states: In Progress, Toss, Innings Break, Stumps, Lunch, Tea, Delay, Rain Delay
 - Toss state now treated as live event (shows green indicator, updates every minute)
 - Match start time tracking and automatic timer scheduling
+- Smart filtering: Completed matches automatically removed when live matches are active
 - Project documentation: LICENSE, CHANGELOG.md, CODE_OF_CONDUCT.md
 - Dependabot configuration for automated dependency updates
-- ESLint configuration for code quality with npm scripts (lint, lint:fix)
+- ESLint v9 flat config format (eslint.config.js)
+- Package.json type declaration as ES module
 
 ### Changed
 - Live match detection now checks both status messages and match state
 - Improved API call efficiency with smart scheduling based on match start times
+- Migrated from .eslintrc.json to ESLint v9 flat config format
+- Updated ESLint scripts to remove trailing dot (ESLint v9 requirement)
+- Updated README to use `node --run` instead of `npm run`
+- Added Node.js globals (fetch, Buffer) to ESLint configuration
 - Updated README with file structure, linting instructions, and community guidelines
+
+### Removed
+- Legacy .eslintrc.json and .eslintignore files (replaced by flat config)
 
 ## [1.2.0] - 2025-12-23
 
